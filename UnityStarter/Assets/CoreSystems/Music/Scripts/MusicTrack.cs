@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace MusicSystem
+namespace CoreSystems.MusicSystem
 {
     [RequireComponent(typeof(AudioSource))]
     [RequireComponent(typeof(AudioClip))]

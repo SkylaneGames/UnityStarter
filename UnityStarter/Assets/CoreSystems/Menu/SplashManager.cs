@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MusicSystem;
-using TransitionSystem;
+using CoreSystems.MusicSystem;
+using CoreSystems.TransitionSystem;
 
 public class SplashManager : MonoBehaviour
 {

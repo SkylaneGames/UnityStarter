@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MusicSystem
+namespace CoreSystems
 {
     public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {

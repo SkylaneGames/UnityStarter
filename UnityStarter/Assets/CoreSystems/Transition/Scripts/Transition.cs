@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace TransitionSystem
+namespace CoreSystems.TransitionSystem
 {
     [RequireComponent(typeof(Animator))]
     public class Transition : MonoBehaviour

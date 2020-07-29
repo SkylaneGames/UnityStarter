@@ -3,12 +3,19 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace TransitionSystem
+namespace CoreSystems.TransitionSystem
 {
     public enum TransitionType
     {
         Fade,
         HorizontalSwipe
+    }
+
+    public enum Level
+    {
+        Splash,
+        Menu,
+        Game
     }
 
     public class LevelLoader : Singleton<LevelLoader>
@@ -18,13 +25,6 @@ namespace TransitionSystem
         private Transition transition;
 
         public bool LoadingLevel { get; private set; }
-
-        public enum Levels
-        {
-            Splash,
-            Menu,
-            Game
-        }
 
         void Awake()
         {
@@ -53,6 +53,11 @@ namespace TransitionSystem
         public void LoadLevel(int sceneBuildIndex)
         {
             StartCoroutine(LoadLevelRoutine(sceneBuildIndex));
+        }
+
+        public void LoadLevel(Level level)
+        {
+            LoadLevel((int)level);
         }
 
         IEnumerator LoadLevelRoutine(int sceneBuildIndex)
