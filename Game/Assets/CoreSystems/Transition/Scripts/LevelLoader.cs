@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,7 +9,9 @@ namespace CoreSystems.TransitionSystem
     public enum TransitionType
     {
         Fade,
-        HorizontalSwipe
+        HorizontalSwipe,
+        CircleZoom,
+        CircleSwipe
     }
 
     public enum Level
@@ -20,27 +23,34 @@ namespace CoreSystems.TransitionSystem
 
     public class LevelLoader : Singleton<LevelLoader>
     {
-        public TransitionType transitionType;
+        public TransitionType transitionIn;
+        public TransitionType transitionOut;
 
-        private Transition transition;
+        private Transition currentTransition;
+        private IEnumerable<Transition> transitions;
 
         public bool LoadingLevel { get; private set; }
 
         void Awake()
         {
-            var transitions = GetComponentsInChildren<Transition>();
-            transition = transitions.FirstOrDefault(p => p.TransitionType == transitionType);
-            var disabledTransitions = transitions.Where(p => p != transition);
+            transitions = GetComponentsInChildren<Transition>();
+            SetTransition(transitionIn);
+        }
 
-            if (transition == null)
+        private void SetTransition(TransitionType type)
+        {
+            currentTransition = transitions.FirstOrDefault(p => p.TransitionType == type);
+            var disabledTransitions = transitions.Where(p => p != currentTransition);
+
+            if (currentTransition == null)
             {
-                Debug.LogError($"Transition '{transitionType.ToString()}' does not exist.");
+                Debug.LogError($"Transition '{type.ToString()}' does not exist.");
             }
             else
             {
-                transition.gameObject.SetActive(true);
-            }
-
+                currentTransition.gameObject.SetActive(true);
+            }            
+            
             disabledTransitions.ToList().ForEach(p => p.gameObject.SetActive(false));
         }
 
@@ -63,9 +73,11 @@ namespace CoreSystems.TransitionSystem
         IEnumerator LoadLevelRoutine(int sceneBuildIndex)
         {
             LoadingLevel = true;
-            transition.TransitionOut();
+            SetTransition(transitionOut);
 
-            yield return new WaitForSeconds(transition.TransitionTime);
+            currentTransition.TransitionOut();
+
+            yield return new WaitForSeconds(currentTransition.TransitionTime);
 
             LoadingLevel = false;
             SceneManager.LoadScene(sceneBuildIndex);
