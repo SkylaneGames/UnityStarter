@@ -179,6 +179,10 @@ PrefabInstance:
       value: MusicManager
       objectReference: {fileID: 0}
     - target: {fileID: 631895106568087615, guid: 3c458fbf4f4764345a3a3170c18243ff, type: 3}
+      propertyPath: m_Volume
+      value: 0.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 631895106568087615, guid: 3c458fbf4f4764345a3a3170c18243ff, type: 3}
       propertyPath: m_audioClip
       value: 
       objectReference: {fileID: 8300000, guid: fd72584cf0be14beb9d215ada2fa93f8, type: 3}
