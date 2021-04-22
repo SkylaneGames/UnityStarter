@@ -2,29 +2,22 @@ name: Unity Build
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push but only for tags starting with "v" (i.e. v0.1)
   push:
     tags: v*
-    # branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  build-webgl:
     runs-on: self-hosted
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
       - name: Unity - Build
-        run: ./.scripts/build.bat
+        run: ./.scripts/build_webgl.bat
       
       - name: Create Archive
         run: Compress-Archive -Path ./build/* -DestinationPath ./game.zip
@@ -32,31 +25,170 @@ jobs:
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.2
         with:
-          name: Game
+          name: game_webgl
+          path: ./game.zip
+          retention-days: 9
+
+  build-win64:
+    runs-on: self-hosted
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Unity - Build
+        run: ./.scripts/build_win64.bat
+      
+      - name: Create Archive
+        run: Compress-Archive -Path ./build/* -DestinationPath ./game.zip
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.2
+        with:
+          name: game_win64
+          path: ./game.zip
+          retention-days: 9
+
+  build-osx:
+    runs-on: self-hosted
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Unity - Build
+        run: ./.scripts/build_osx.bat
+      
+      - name: Create Archive
+        run: Compress-Archive -Path ./build/* -DestinationPath ./game.zip
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.2
+        with:
+          name: game_osx
+          path: ./game.zip
+          retention-days: 9
+
+  build-linux:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Unity - Build
+        run: ./.scripts/build_linux.bat
+      
+      - name: Create Archive
+        run: Compress-Archive -Path ./build/* -DestinationPath ./game.zip
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.2
+        with:
+          name: game_linux
           path: ./game.zip
           retention-days: 9
          
-  deploy:
-    runs-on: self-hosted
-    needs: [build]
+  deploy-webgl:
+    runs-on: windows-latest
+    needs: [build-webgl]
     name: Deploy to itch.io
     env:
       BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-      itch_channel: <channel name> # e.g. jms777/gameName:web
-      itch_url: <your game url> #e.g. https://jms777.itch.io/brackeys2021-1 
+      itch_channel: <username>/<game>:web # e.g. jms777/gameName:web
     steps:
       - name: Download Game Artifact
         uses: actions/download-artifact@v2.0.8
         with:
-          name: Game
+          name: game_webgl
       - name: Configure Butler
         run: |
           Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default -OutFile butler.zip
           Expand-Archive -Path butler.zip -DestinationPath .
           ./butler.exe -V
           ./butler.exe login
+        shell: powershell
       - name: Push to itch.io
         run: ./butler.exe push ./game.zip $env:itch_channel
+        shell: powershell
+         
+  deploy-win64:
+    runs-on: windows-latest
+    needs: [build-win64]
+    name: Deploy to itch.io
+    env:
+      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      itch_channel: <username>/<game>:win64 # e.g. jms777/gameName:win64
+    steps:
+      - name: Download Game Artifact
+        uses: actions/download-artifact@v2.0.8
+        with:
+          name: game_win64
+      - name: Configure Butler
+        run: |
+          Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default -OutFile butler.zip
+          Expand-Archive -Path butler.zip -DestinationPath .
+          ./butler.exe -V
+          ./butler.exe login
+        shell: powershell
+      - name: Push to itch.io
+        run: ./butler.exe push ./game.zip $env:itch_channel
+        shell: powershell
+         
+  deploy-osx:
+    runs-on: windows-latest
+    needs: [build-osx]
+    name: Deploy to itch.io
+    env:
+      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      itch_channel: <username>/<game>:osx # e.g. jms777/gameName:osx
+    steps:
+      - name: Download Game Artifact
+        uses: actions/download-artifact@v2.0.8
+        with:
+          name: game_osx
+      - name: Configure Butler
+        run: |
+          Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default -OutFile butler.zip
+          Expand-Archive -Path butler.zip -DestinationPath .
+          ./butler.exe -V
+          ./butler.exe login
+        shell: powershell
+      - name: Push to itch.io
+        run: ./butler.exe push ./game.zip $env:itch_channel
+        shell: powershell
+         
+  deploy-linux:
+    runs-on: windows-latest
+    needs: [build-linux]
+    name: Deploy to itch.io
+    env:
+      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+      itch_channel: <username>/<game>:linux # e.g. jms777/gameName:linux
+    steps:
+      - name: Download Game Artifact
+        uses: actions/download-artifact@v2.0.8
+        with:
+          name: game_linux
+      - name: Configure Butler
+        run: |
+          Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default -OutFile butler.zip
+          Expand-Archive -Path butler.zip -DestinationPath .
+          ./butler.exe -V
+          ./butler.exe login
+        shell: powershell
+      - name: Push to itch.io
+        run: ./butler.exe push ./game.zip $env:itch_channel
+        shell: powershell
+
+  notify:
+    runs-on: windows-latest
+    needs: [deploy-webgl, deploy-win64, deploy-osx, deploy-linux]
+    name: Notify Discord
+    env:
+      itch_url: https://<username>.itch.io/<game> #e.g. https://jms777.itch.io/brackeys2021-1 
+    if: success() 
+    steps:
       - name: Notify Discord
-        if: success()
         run: Invoke-WebRequest -Method Post -Body @{content="New build deployed - $env:itch_url"} -Uri https://discord.com/api/webhooks/806215909349392416/50ZFHErCNojaeCcQ4x1U7RcwFYXoaPv5YG0uzeiioB7MNGQRGVYoqK_kZaUkocj3BMlK
+        shell: powershell
+
