@@ -1,4 +1,4 @@
-﻿namespace CoreSystems.MusicSystem
+﻿namespace CoreSystems.Music.Scripts
 {
     public enum MusicTrackIdentifier
     {

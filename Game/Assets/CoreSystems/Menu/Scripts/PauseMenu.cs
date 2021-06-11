@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using CoreSystems.Transition.Scripts;
 using UnityEngine;
-using CoreSystems.TransitionSystem;
 
-namespace CoreSystems.MenuSystem
+namespace CoreSystems.Menu.Scripts
 {
     public class PauseMenu : MonoBehaviour, IPauseMenu
     {

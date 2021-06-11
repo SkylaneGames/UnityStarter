@@ -1,25 +1,25 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace CoreSystems.TransitionSystem
+namespace CoreSystems.Transition.Scripts
 {
     [RequireComponent(typeof(Animator))]
     public class Transition : MonoBehaviour
     {
-        public TransitionType TransitionType;
-        public float TransitionTime = 1f;
+        [FormerlySerializedAs("TransitionType")] public TransitionType transitionType;
+        [FormerlySerializedAs("TransitionTime")] public float transitionTime = 1f;
 
-        private Animator animator;
+        private Animator _animator;
+        private static readonly int Start = Animator.StringToHash("Start");
 
         void Awake()
         {
-            animator = GetComponent<Animator>();
+            _animator = GetComponent<Animator>();
         }
 
         public void TransitionOut()
         {
-            animator.SetTrigger("Start");
+            _animator.SetTrigger(Start);
         }
     }
 }

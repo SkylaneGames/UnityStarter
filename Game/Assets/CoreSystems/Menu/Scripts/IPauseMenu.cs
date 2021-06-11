@@ -1,4 +1,4 @@
-namespace CoreSystems.MenuSystem
+namespace CoreSystems.Menu.Scripts
 {
     public interface IPauseMenu
     {

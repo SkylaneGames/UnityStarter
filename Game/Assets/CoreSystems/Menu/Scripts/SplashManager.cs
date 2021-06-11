@@ -1,28 +1,27 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using CoreSystems.Music.Scripts;
+using CoreSystems.Transition.Scripts;
 using UnityEngine;
-using CoreSystems.MusicSystem;
-using CoreSystems.TransitionSystem;
+using UnityEngine.Serialization;
 
 public class SplashManager : MonoBehaviour
 {
-    [Range(0, 10)]
-    public float Duration = 2f;
+    [FormerlySerializedAs("Duration")] [Range(0, 10)]
+    public float duration = 2f;
 
-    private float timeRemaining;
+    private float _timeRemaining;
 
     // Start is called before the first frame update
     void Start()
     {
-        timeRemaining = Duration;
+        _timeRemaining = duration;
     }
 
     // Update is called once per frame
     void Update()
     {
-        timeRemaining -= Time.deltaTime;
+        _timeRemaining -= Time.deltaTime;
 
-        if (timeRemaining <= 0)
+        if (_timeRemaining <= 0)
         {
             MusicManager.Instance.FadeIn(MusicTrackIdentifier.MainTrack);
             LevelLoader.Instance.LoadNextLevel();

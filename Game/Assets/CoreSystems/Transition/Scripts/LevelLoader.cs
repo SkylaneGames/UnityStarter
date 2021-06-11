@@ -1,10 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using CoreSystems.Scripts;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace CoreSystems.TransitionSystem
+namespace CoreSystems.Transition.Scripts
 {
     public enum TransitionType
     {
@@ -26,29 +27,29 @@ namespace CoreSystems.TransitionSystem
         public TransitionType transitionIn;
         public TransitionType transitionOut;
 
-        private Transition currentTransition;
-        private IEnumerable<Transition> transitions;
+        private Transition _currentTransition;
+        private IEnumerable<Transition> _transitions;
 
         public bool LoadingLevel { get; private set; }
 
         void Awake()
         {
-            transitions = GetComponentsInChildren<Transition>();
+            _transitions = GetComponentsInChildren<Transition>();
             SetTransition(transitionIn);
         }
 
         private void SetTransition(TransitionType type)
         {
-            currentTransition = transitions.FirstOrDefault(p => p.TransitionType == type);
-            var disabledTransitions = transitions.Where(p => p != currentTransition);
+            _currentTransition = _transitions.FirstOrDefault(p => p.transitionType == type);
+            var disabledTransitions = _transitions.Where(p => p != _currentTransition);
 
-            if (currentTransition == null)
+            if (_currentTransition == null)
             {
                 Debug.LogError($"Transition '{type.ToString()}' does not exist.");
             }
             else
             {
-                currentTransition.gameObject.SetActive(true);
+                _currentTransition.gameObject.SetActive(true);
             }            
             
             disabledTransitions.ToList().ForEach(p => p.gameObject.SetActive(false));
@@ -75,9 +76,9 @@ namespace CoreSystems.TransitionSystem
             LoadingLevel = true;
             SetTransition(transitionOut);
 
-            currentTransition.TransitionOut();
+            _currentTransition.TransitionOut();
 
-            yield return new WaitForSeconds(currentTransition.TransitionTime);
+            yield return new WaitForSeconds(_currentTransition.transitionTime);
 
             LoadingLevel = false;
             SceneManager.LoadScene(sceneBuildIndex);

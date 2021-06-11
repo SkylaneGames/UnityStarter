@@ -1,42 +1,31 @@
 using UnityEngine;
 
-namespace CoreSystems
+namespace CoreSystems.Scripts
 {
     public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        private static bool shuttingDown = false;
-        private static object m_Lock = new object();
-        private static T instance;
+        private static readonly object MLock = new object();
+        private static T _instance;
 
         public static T Instance
         {
             get
             {
-                lock (m_Lock){
-                    if (instance == null){
-                        instance = FindObjectOfType<T>();
+                lock (MLock){
+                    if (_instance != null) return _instance;
+                    _instance = FindObjectOfType<T>();
 
-                        if (instance == null)
-                        {
-                            var singletonObject = new GameObject();
-                            instance = singletonObject.AddComponent<T>();
-                            singletonObject.name = typeof(T).ToString() + " (Singleton)";
-                            Debug.Log($"Creating new instance of {typeof(T).Name}");
-                            DontDestroyOnLoad(singletonObject);
-                        }
-                    }
+                    if (_instance != null) return _instance;
 
-                    return instance;
+                    var singletonObject = new GameObject();
+                    _instance = singletonObject.AddComponent<T>();
+                    singletonObject.name = typeof(T) + " (Singleton)";
+                    Debug.Log($"Creating new instance of {typeof(T).Name}");
+                    DontDestroyOnLoad(singletonObject);
+
+                    return _instance;
                 }
             }
-        }
-
-        private void OnApplicationQuit() {
-            shuttingDown = true;
-        }
-
-        private void OnDestroy() {
-            shuttingDown = true;
         }
     }
 }
