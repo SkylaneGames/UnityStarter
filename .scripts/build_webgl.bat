@@ -1,1 +1,1 @@
-"C:\Program Files\Unity\Hub\Editor\2021.1.3f1\Editor\Unity.exe" -batchmode -quit -nographics -projectPath ./Game/ -executeMethod BuildHelper.PerformBuildWebGL -logFile build.log
+"C:\Program Files\Unity\Hub\Editor\2021.1.9f1\Editor\Unity.exe" -batchmode -quit -nographics -projectPath ./Game/ -executeMethod Editor.BuildHelper.PerformBuildWebGL -logFile build.log

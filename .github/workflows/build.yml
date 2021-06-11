@@ -69,24 +69,24 @@ jobs:
           path: ./game.zip
           retention-days: 9
 
-  build-linux:
-    runs-on: self-hosted
+  # build-linux:
+  #   runs-on: self-hosted
 
-    steps:
-      - uses: actions/checkout@v2
+  #   steps:
+  #     - uses: actions/checkout@v2
 
-      - name: Unity - Build
-        run: ./.scripts/build_linux.bat
+  #     - name: Unity - Build
+  #       run: ./.scripts/build_linux.bat
       
-      - name: Create Archive
-        run: Compress-Archive -Path ./build/* -DestinationPath ./game.zip
+  #     - name: Create Archive
+  #       run: Compress-Archive -Path ./build/* -DestinationPath ./game.zip
 
-      - name: Upload a Build Artifact
-        uses: actions/upload-artifact@v2.2.2
-        with:
-          name: game_linux
-          path: ./game.zip
-          retention-days: 9
+  #     - name: Upload a Build Artifact
+  #       uses: actions/upload-artifact@v2.2.2
+  #       with:
+  #         name: game_linux
+  #         path: ./game.zip
+  #         retention-days: 9
          
   deploy-webgl:
     runs-on: windows-latest
@@ -94,7 +94,7 @@ jobs:
     name: Deploy to itch.io
     env:
       BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-      itch_channel: <username>/<game>:web # e.g. jms777/gameName:web
+      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:web # e.g. jms777/gameName:web
     steps:
       - name: Download Game Artifact
         uses: actions/download-artifact@v2.0.8
@@ -117,7 +117,7 @@ jobs:
     name: Deploy to itch.io
     env:
       BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-      itch_channel: <username>/<game>:win64 # e.g. jms777/gameName:win64
+      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:win64 # e.g. jms777/gameName:win64
     steps:
       - name: Download Game Artifact
         uses: actions/download-artifact@v2.0.8
@@ -140,7 +140,7 @@ jobs:
     name: Deploy to itch.io
     env:
       BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-      itch_channel: <username>/<game>:osx # e.g. jms777/gameName:osx
+      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:osx # e.g. jms777/gameName:osx
     steps:
       - name: Download Game Artifact
         uses: actions/download-artifact@v2.0.8
@@ -157,35 +157,35 @@ jobs:
         run: ./butler.exe push ./game.zip $env:itch_channel
         shell: powershell
          
-  deploy-linux:
-    runs-on: windows-latest
-    needs: [build-linux]
-    name: Deploy to itch.io
-    env:
-      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-      itch_channel: <username>/<game>:linux # e.g. jms777/gameName:linux
-    steps:
-      - name: Download Game Artifact
-        uses: actions/download-artifact@v2.0.8
-        with:
-          name: game_linux
-      - name: Configure Butler
-        run: |
-          Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default -OutFile butler.zip
-          Expand-Archive -Path butler.zip -DestinationPath .
-          ./butler.exe -V
-          ./butler.exe login
-        shell: powershell
-      - name: Push to itch.io
-        run: ./butler.exe push ./game.zip $env:itch_channel
-        shell: powershell
+  # deploy-linux:
+  #   runs-on: windows-latest
+  #   needs: [build-linux]
+  #   name: Deploy to itch.io
+  #   env:
+  #     BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+  #     itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:linux # e.g. jms777/gameName:linux
+  #   steps:
+  #     - name: Download Game Artifact
+  #       uses: actions/download-artifact@v2.0.8
+  #       with:
+  #         name: game_linux
+  #     - name: Configure Butler
+  #       run: |
+  #         Invoke-WebRequest -Uri https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default -OutFile butler.zip
+  #         Expand-Archive -Path butler.zip -DestinationPath .
+  #         ./butler.exe -V
+  #         ./butler.exe login
+  #       shell: powershell
+  #     - name: Push to itch.io
+  #       run: ./butler.exe push ./game.zip $env:itch_channel
+  #       shell: powershell
 
   notify:
     runs-on: windows-latest
-    needs: [deploy-webgl, deploy-win64, deploy-osx, deploy-linux]
+    needs: [deploy-webgl, deploy-win64, deploy-osx]
     name: Notify Discord
     env:
-      itch_url: https://<username>.itch.io/<game> #e.g. https://jms777.itch.io/brackeys2021-1 
+      itch_url: https://${{ secrets.ITCH_USERNAME }}.itch.io/${{ secrets.ITCH_GAME_NAME }} #e.g. https://jms777.itch.io/brackeys2021-1 
     if: success() 
     steps:
       - name: Notify Discord
