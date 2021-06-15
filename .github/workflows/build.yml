@@ -91,10 +91,10 @@ jobs:
   deploy-webgl:
     runs-on: windows-latest
     needs: [build-webgl]
-    name: Deploy to itch.io
+    name: Deploy to itch.io (Web)
     env:
       BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:web # e.g. jms777/gameName:web
+      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:web
     steps:
       - name: Download Game Artifact
         uses: actions/download-artifact@v2.0.8
@@ -114,10 +114,10 @@ jobs:
   deploy-win64:
     runs-on: windows-latest
     needs: [build-win64]
-    name: Deploy to itch.io
+    name: Deploy to itch.io (win64)
     env:
       BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:win64 # e.g. jms777/gameName:win64
+      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:win64
     steps:
       - name: Download Game Artifact
         uses: actions/download-artifact@v2.0.8
@@ -137,10 +137,10 @@ jobs:
   deploy-osx:
     runs-on: windows-latest
     needs: [build-osx]
-    name: Deploy to itch.io
+    name: Deploy to itch.io (OSX)
     env:
       BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:osx # e.g. jms777/gameName:osx
+      itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:osx
     steps:
       - name: Download Game Artifact
         uses: actions/download-artifact@v2.0.8
@@ -160,10 +160,10 @@ jobs:
   # deploy-linux:
   #   runs-on: windows-latest
   #   needs: [build-linux]
-  #   name: Deploy to itch.io
+  #   name: Deploy to itch.io (Linux)
   #   env:
   #     BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
-  #     itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:linux # e.g. jms777/gameName:linux
+  #     itch_channel: ${{ secrets.ITCH_USERNAME }}/${{ secrets.ITCH_GAME_NAME }}:linux
   #   steps:
   #     - name: Download Game Artifact
   #       uses: actions/download-artifact@v2.0.8
@@ -185,10 +185,10 @@ jobs:
     needs: [deploy-webgl, deploy-win64, deploy-osx]
     name: Notify Discord
     env:
-      itch_url: https://${{ secrets.ITCH_USERNAME }}.itch.io/${{ secrets.ITCH_GAME_NAME }} #e.g. https://jms777.itch.io/brackeys2021-1 
+      itch_url: https://${{ secrets.ITCH_USERNAME }}.itch.io/${{ secrets.ITCH_GAME_NAME }}
     if: success() 
     steps:
       - name: Notify Discord
-        run: Invoke-WebRequest -Method Post -Body @{content="New build deployed - $env:itch_url"} -Uri https://discord.com/api/webhooks/806215909349392416/50ZFHErCNojaeCcQ4x1U7RcwFYXoaPv5YG0uzeiioB7MNGQRGVYoqK_kZaUkocj3BMlK
+        run: Invoke-WebRequest -Method Post -Body @{content="New build deployed - $env:itch_url"} -Uri ${{ secrets.DISCORD_WEBHOOK_URL }}
         shell: powershell
 
